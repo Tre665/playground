@@ -1,5 +1,5 @@
 {
-    "conventionalCommits.scopes": [
-        "frontend"
-    ]
+  "conventionalCommits.scopes": ["frontend"],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true
 }
