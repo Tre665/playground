@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import dotenv from 'dotenv';
 import { app } from './app';
 import fastifyMongo from '@fastify/mongodb';
+import fastifyCors from '@fastify/cors';
 import { Env } from '../env';
 
 dotenv.config();
@@ -35,6 +36,11 @@ server.register(fastifyMongo, {
   url: process.env.MONGODB_URI,
   database: process.env.MONGODB_DB ?? 'weather-widgets',
   forceClose: true,
+});
+
+server.register(fastifyCors, {
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'DELETE'],
 });
 
 // Register your application as a normal plugin.
