@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyPluginAsync, FastifyRequest } from 'fastify';
-import { addWidget, getAllWidgets } from '../controllers/widgets.controller';
+import { addWidget, getAllWidgets, removeWidget } from '../controllers/widgets.controller';
 import { CreateWidgetPayload } from '../types/widgets.types';
 
 const widgets: FastifyPluginAsync = async (
@@ -14,6 +14,13 @@ const widgets: FastifyPluginAsync = async (
     '/widgets',
     async function (request: FastifyRequest<{ Body: CreateWidgetPayload }>, reply) {
       return addWidget(request, reply);
+    },
+  );
+
+  server.delete(
+    '/widgets/:id',
+    async function (request: FastifyRequest<{ Params: { id: string } }>, reply) {
+      return removeWidget(request, reply);
     },
   );
 };
