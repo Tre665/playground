@@ -1,6 +1,8 @@
+export type Env = 'development' | 'production' | 'test';
+
 declare namespace NodeJS {
   interface ProcessEnv {
-    NODE_ENV: 'development' | 'production' | 'test';
+    NODE_ENV: Env;
     HOST: string;
     PORT: number;
     MONGODB_URI: string;
