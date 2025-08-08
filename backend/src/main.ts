@@ -2,12 +2,13 @@ import Fastify from 'fastify';
 import dotenv from 'dotenv';
 import { app } from './app';
 import fastifyMongo from '@fastify/mongodb';
+import { Env } from '../env';
 
 dotenv.config();
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 5000;
-const environment = process.env.NODE_ENV ?? 'development';
+const environment: Env = (process.env.NODE_ENV ?? 'development') as Env;
 
 // Configure logger
 const envToLogger = {
