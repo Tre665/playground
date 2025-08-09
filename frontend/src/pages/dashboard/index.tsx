@@ -1,28 +1,28 @@
 import { SimpleWeatherWidget } from '@/components/simple-weather-widget';
+import http from '@/utils/axios-config';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 
 interface WeatherWidgetData {
   location: string;
   temperature?: number;
 }
 
+const widgetFetcher = async (url: string) => {
+  const res = await http.get<WeatherWidgetData[]>(url);
+  return res.data;
+};
+
 export default function Page() {
-  const [data, setData] = useState<WeatherWidgetData[]>([]);
+  const { data = [], error, isLoading } = useSWR('/widgets', widgetFetcher);
 
-  useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/widgets');
-        const json = await res.json();
-        setData(json);
-      } catch (err) {
-        console.error('Failed to fetch weather data:', err);
-      }
-    };
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
 
-    fetchWeather();
-  }, []);
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   return (
     <>
