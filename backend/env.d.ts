@@ -7,5 +7,6 @@ declare namespace NodeJS {
     PORT: number;
     MONGODB_URI: string;
     MONGODB_DB: string;
+    OPEN_WEATHER_API_KEY: string;
   }
 }
