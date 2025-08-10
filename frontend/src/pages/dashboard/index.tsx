@@ -48,13 +48,22 @@ export default function Page() {
 
   const onLocationAddSelected = async (location: Location) => {
     try {
-      const response = await http.post<WeatherWidgetData>('/widgets', {
+      const _response = await http.post<WeatherWidgetData>('/widgets', {
         location,
       });
 
-      mutate();
+      await mutate();
     } catch (err) {
       console.error('failed to create widget', err);
+    }
+  };
+
+  const onWidgetRemove = async (id: string) => {
+    try {
+      const _response = await http.delete<void>(`/widgets/${id}`);
+      await mutate();
+    } catch (err) {
+      console.error('failed to delete widget', err);
     }
   };
 
@@ -95,7 +104,7 @@ export default function Page() {
 
       <ul className="container grid list-none gap-6 px-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {data.map((item) => (
-          <li key={item._id}>
+          <li key={item._id} onClick={() => onWidgetRemove(item._id)}>
             <SimpleWeatherWidget
               location={item.location.name}
               temperature={item.temperature}
