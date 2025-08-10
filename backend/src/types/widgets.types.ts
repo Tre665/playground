@@ -1,3 +1,5 @@
+import { GeolocationDto } from './geolocation.types';
+
 /** Represents a weather widget for a specific city */
 export interface Widget {
   /** The _id of the widget */
@@ -14,8 +16,8 @@ export interface Widget {
 
 /** The payload for creating a new widget */
 export interface CreateWidgetPayload {
-  /** The city name */
-  location: string;
+  /** The Location information for the widget */
+  location: GeolocationDto;
   /** The user ID of the user who created the widget */
   userId?: string;
 }

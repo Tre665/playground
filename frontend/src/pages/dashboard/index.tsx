@@ -6,11 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 import debounce from 'lodash.debounce';
 import { SearchResultLocation } from '@/components/search-result-location';
-
-interface WeatherWidgetData {
-  location: string;
-  temperature?: number;
-}
+import { WeatherWidgetData } from '@/types/weather-widget';
 
 const widgetFetcher = async (url: string) => {
   const res = await http.get<WeatherWidgetData[]>(url);
@@ -53,7 +49,7 @@ export default function Page() {
   const onLocationAddSelected = async (location: Location) => {
     try {
       const response = await http.post<WeatherWidgetData>('/widgets', {
-        location: location.name,
+        location,
       });
 
       mutate();
@@ -75,7 +71,7 @@ export default function Page() {
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <p>Error:{JSON.stringify(error)}</p>;
   }
 
   return (
@@ -98,9 +94,12 @@ export default function Page() {
       </header>
 
       <ul className="container grid list-none gap-6 px-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {data.map((item) => (
-          <li key={item.location}>
-            <SimpleWeatherWidget {...item} />
+        {data.map((item, index) => (
+          <li key={index}>
+            <SimpleWeatherWidget
+              location={item.location.name}
+              temperature={item.temperature}
+            />
           </li>
         ))}
       </ul>
