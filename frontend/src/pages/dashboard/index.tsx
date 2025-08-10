@@ -94,8 +94,8 @@ export default function Page() {
       </header>
 
       <ul className="container grid list-none gap-6 px-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {data.map((item, index) => (
-          <li key={index}>
+        {data.map((item) => (
+          <li key={item._id}>
             <SimpleWeatherWidget
               location={item.location.name}
               temperature={item.temperature}
