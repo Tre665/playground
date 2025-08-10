@@ -1,20 +1,15 @@
 import { SearchInput } from '@/components/search-input';
 import { SimpleWeatherWidget } from '@/components/simple-weather-widget';
+import { Location } from '@/types/location';
 import http from '@/utils/axios-config';
 import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 import debounce from 'lodash.debounce';
+import { SearchResultLocation } from '@/components/search-result-location';
 
 interface WeatherWidgetData {
   location: string;
   temperature?: number;
-}
-
-interface Location {
-  name: string;
-  fullName: string;
-  lat: number;
-  lon: number;
 }
 
 const widgetFetcher = async (url: string) => {
@@ -50,6 +45,10 @@ export default function Page() {
     debouncedQueryChange.current(value);
   };
 
+  const onLocationAddSelected = (location: Location) => {
+    console.log('selected location', location);
+  };
+
   // clean up on destroy / unmount
   useEffect(() => {
     return () => {
@@ -75,7 +74,12 @@ export default function Page() {
 
         <div className="w-full sm:max-w-md sm:flex-1">
           <SearchInput queryChanged={onQueryChange} results={locationData}>
-            {(location) => <p>{location.fullName}</p>}
+            {(location) => (
+              <SearchResultLocation
+                location={location}
+                onSelect={onLocationAddSelected}
+              />
+            )}
           </SearchInput>
         </div>
       </header>
