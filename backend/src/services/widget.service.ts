@@ -1,6 +1,8 @@
 import { Db, ObjectId } from 'mongodb';
 import { CreateWidget, Widget } from '../models/widgets.models';
+import { Location } from '../models/location.models';
 
+// todo(tre): add proper type checking
 export class WidgetService {
   constructor(private db: Db) {}
 
@@ -8,7 +10,7 @@ export class WidgetService {
     return this.db.collection<Widget>('widgets').find().toArray();
   }
 
-  async createWidget(location: string, userId?: string): Promise<Widget> {
+  async createWidget(location: Location, userId?: string): Promise<Widget> {
     const newWidget: CreateWidget = {
       location,
       userId: userId && ObjectId.isValid(userId) ? new ObjectId(userId) : null,
