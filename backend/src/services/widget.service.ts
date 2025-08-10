@@ -1,13 +1,27 @@
 import { Db, ObjectId } from 'mongodb';
-import { CreateWidget, Widget } from '../models/widgets.models';
+import { CreateWidget, WeatherWidget, Widget } from '../models/widgets.models';
 import { Location } from '../models/location.models';
+import { fetchCurrentWeatherForLocation } from './open-weather.service';
+import { mapWeatherDataToWidget } from '../models/widget.mappings';
 
 // todo(tre): add proper type checking
 export class WidgetService {
   constructor(private db: Db) {}
 
-  async fetchAllWidgets(): Promise<Widget[]> {
-    return this.db.collection<Widget>('widgets').find().toArray();
+  async fetchAllWidgets(): Promise<WeatherWidget[]> {
+    const widgets = await this.db.collection<Widget>('widgets').find().toArray();
+
+    const weatherResults = await Promise.all(
+      widgets.map((widget) =>
+        fetchCurrentWeatherForLocation({ lat: widget.location.lat, long: widget.location.lon }),
+      ),
+    );
+
+    const weatherWidgets = widgets.map((widget, index) =>
+      mapWeatherDataToWidget(widget, weatherResults[index]),
+    );
+
+    return weatherWidgets;
   }
 
   async createWidget(location: Location, userId?: string): Promise<Widget> {

@@ -19,3 +19,12 @@ export interface Widget {
  * Represents the data needed to create a new widget in the data store
  */
 export interface CreateWidget extends Omit<Widget, '_id'> {}
+
+/** Combines persisted widget data with the current weather data */
+export interface WeatherWidget extends Widget {
+  weatherData: WeatherData;
+}
+
+export interface WeatherData {
+  temperature?: number;
+}

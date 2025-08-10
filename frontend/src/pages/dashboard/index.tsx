@@ -107,7 +107,7 @@ export default function Page() {
           <li key={item._id} onClick={() => onWidgetRemove(item._id)}>
             <SimpleWeatherWidget
               location={item.location.name}
-              temperature={item.temperature}
+              temperature={item.weatherData?.temperature}
             />
           </li>
         ))}
