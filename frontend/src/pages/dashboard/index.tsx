@@ -27,7 +27,12 @@ const MINIMUM_QUERY_LENGTH = 3;
 export default function Page() {
   const [query, setQuery] = useState('');
 
-  const { data = [], error, isLoading } = useSWR('/widgets', widgetFetcher);
+  const {
+    data = [],
+    error,
+    isLoading,
+    mutate,
+  } = useSWR('/widgets', widgetFetcher);
   const { data: locationData = [] } = useSWR(
     query?.length >= MINIMUM_QUERY_LENGTH ? `/locations?query=${query}` : null,
     locationsFetcher,
@@ -45,8 +50,16 @@ export default function Page() {
     debouncedQueryChange.current(value);
   };
 
-  const onLocationAddSelected = (location: Location) => {
-    console.log('selected location', location);
+  const onLocationAddSelected = async (location: Location) => {
+    try {
+      const response = await http.post<WeatherWidgetData>('/widgets', {
+        location: location.name,
+      });
+
+      mutate();
+    } catch (err) {
+      console.error('failed to create widget', err);
+    }
   };
 
   // clean up on destroy / unmount
