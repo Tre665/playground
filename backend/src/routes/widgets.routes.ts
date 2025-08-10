@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyPluginAsync, FastifyRequest } from 'fastify';
 import { addWidget, getAllWidgets, removeWidget } from '../controllers/widgets.controller';
-import { CreateWidgetPayload } from '../types/widgets.types';
+import { CreateWidgetPayloadDto } from '../types/widgets.types';
 
 const widgets: FastifyPluginAsync = async (
   server: FastifyInstance,
@@ -12,7 +12,7 @@ const widgets: FastifyPluginAsync = async (
 
   server.post(
     '/widgets',
-    async function (request: FastifyRequest<{ Body: CreateWidgetPayload }>, reply) {
+    async function (request: FastifyRequest<{ Body: CreateWidgetPayloadDto }>, reply) {
       return addWidget(request, reply);
     },
   );

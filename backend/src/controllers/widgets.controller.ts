@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { CreateWidgetPayload } from '../types/widgets.types';
+import { CreateWidgetPayloadDto } from '../types/widgets.types';
 import { WidgetService } from '../services/widget.service';
 
 /** Gets all widgets from the data store */
@@ -10,13 +10,18 @@ export const getAllWidgets = async (request: FastifyRequest, reply: FastifyReply
     return reply.status(500).send({ message: 'Internal server error' });
   }
   const widgetService = new WidgetService(db);
-  const widgets = await widgetService.fetchAllWidgets();
-  return reply.send(widgets);
+  try {
+    const widgets = await widgetService.fetchAllWidgets();
+    return reply.send(widgets);
+  } catch (err) {
+    request.log.error(`Failed to fetch widgets \n${err}`);
+    return reply.status(500).send({ message: 'Internal server error' });
+  }
 };
 
 /** Adds a new widget to the data store */
 export const addWidget = async (
-  request: FastifyRequest<{ Body: CreateWidgetPayload }>,
+  request: FastifyRequest<{ Body: CreateWidgetPayloadDto }>,
   reply: FastifyReply,
 ) => {
   const db = request.server.mongo?.db;
