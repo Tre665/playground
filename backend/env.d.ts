@@ -8,5 +8,6 @@ declare namespace NodeJS {
     MONGODB_URI: string;
     MONGODB_DB: string;
     OPEN_WEATHER_API_KEY: string;
+    CACHE_TTL: number;
   }
 }
