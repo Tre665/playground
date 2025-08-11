@@ -3,18 +3,36 @@ import { CreateWidget, WeatherWidget, Widget } from '../models/widgets.models';
 import { Location } from '../models/location.models';
 import { fetchCurrentWeatherForLocation } from './open-weather.service';
 import { mapWeatherDataToWidget } from '../models/widget.mappings';
+import { WeatherApiResponse } from '../types/open-weather.types';
+import { Cache } from '../cache';
 
 // todo(tre): add proper type checking
 export class WidgetService {
-  constructor(private db: Db) {}
+  constructor(
+    private db: Db,
+    private weatherDataCache: Cache<WeatherApiResponse>,
+  ) {}
 
   async fetchAllWidgets(): Promise<WeatherWidget[]> {
     const widgets = await this.db.collection<Widget>('widgets').find().toArray();
 
     const weatherResults = await Promise.all(
-      widgets.map((widget) =>
-        fetchCurrentWeatherForLocation({ lat: widget.location.lat, long: widget.location.lon }),
-      ),
+      widgets.map(async (widget) => {
+        const cacheKey = this.createCacheKey(widget.location.lat, widget.location.lon);
+        const cachedValue = this.weatherDataCache.get(cacheKey);
+        if (cachedValue !== undefined) {
+          return cachedValue;
+        }
+
+        const weatherData = await fetchCurrentWeatherForLocation({
+          lat: widget.location.lat,
+          long: widget.location.lon,
+        });
+
+        this.weatherDataCache.set(cacheKey, weatherData);
+
+        return weatherData;
+      }),
     );
 
     const weatherWidgets = widgets.map((widget, index) =>
@@ -59,5 +77,10 @@ export class WidgetService {
     }
 
     return deletedCount;
+  }
+
+  /** creates a cache key for a given location */
+  private createCacheKey(lat: number, long: number): string {
+    return `${lat},${long}`;
   }
 }

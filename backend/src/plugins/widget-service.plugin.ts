@@ -1,5 +1,7 @@
 import fp from 'fastify-plugin';
 import { WidgetService } from '../services/widget.service';
+import { InMemoryCache } from '../cache/in-memory-cache';
+import { WeatherApiResponse } from '../types/open-weather.types';
 
 export interface WidgetServicePluginOptions {
   // Specify Support plugin options here
@@ -12,7 +14,9 @@ export default fp<WidgetServicePluginOptions>(async (fastify, opts) => {
     throw new Error('MongoDB not available');
   }
 
-  const widgetService = new WidgetService(db);
+  const weatherDataCache = new InMemoryCache<WeatherApiResponse>();
+
+  const widgetService = new WidgetService(db, weatherDataCache);
   fastify.decorate('widgetService', widgetService);
 });
 
