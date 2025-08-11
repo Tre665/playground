@@ -14,10 +14,6 @@ export interface WidgetDto {
   userId?: string | null;
 }
 
-export interface WeatherWidgetDto extends WidgetDto {
-  temperature?: number;
-}
-
 /** The payload for creating a new widget */
 export interface CreateWidgetPayloadDto {
   /** The Location information for the widget */

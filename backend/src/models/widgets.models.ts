@@ -25,6 +25,7 @@ export interface WeatherWidget extends Widget {
   weatherData: WeatherData;
 }
 
+/** Weather data for a single location */
 export interface WeatherData {
   temperature?: number;
 }
