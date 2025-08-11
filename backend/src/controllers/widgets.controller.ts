@@ -1,15 +1,10 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { CreateWidgetPayloadDto } from '../types/widgets.types';
-import { WidgetService } from '../services/widget.service';
 
 /** Gets all widgets from the data store */
 export const getAllWidgets = async (request: FastifyRequest, reply: FastifyReply) => {
-  const db = request.server.mongo?.db;
-  if (!db) {
-    request.log.error('Failed to connect to database');
-    return reply.status(500).send({ message: 'Internal server error' });
-  }
-  const widgetService = new WidgetService(db);
+  const widgetService = request.server.widgetService;
+
   try {
     const widgets = await widgetService.fetchAllWidgets();
     return reply.send(widgets);
@@ -24,15 +19,8 @@ export const addWidget = async (
   request: FastifyRequest<{ Body: CreateWidgetPayloadDto }>,
   reply: FastifyReply,
 ) => {
-  const db = request.server.mongo?.db;
-  if (!db) {
-    request.log.error('Failed to connect to database');
-    return reply.status(500).send({ message: 'Internal server error' });
-  }
-
+  const widgetService = request.server.widgetService;
   const { location, userId } = request.body;
-
-  const widgetService = new WidgetService(db);
 
   try {
     const newWidget = await widgetService.createWidget(location, userId);
@@ -48,15 +36,8 @@ export const removeWidget = async (
   request: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) => {
-  const db = request.server.mongo?.db;
-  if (!db) {
-    request.log.error('Failed to connect to database');
-    return reply.status(500).send({ message: 'Internal server error' });
-  }
-
+  const widgetService = request.server.widgetService;
   const { id } = request.params;
-
-  const widgetService = new WidgetService(db);
 
   try {
     const deletedCount = await widgetService.removeWidget(id);

@@ -1,0 +1,23 @@
+import fp from 'fastify-plugin';
+import { WidgetService } from '../services/widget.service';
+
+export interface WidgetServicePluginOptions {
+  // Specify Support plugin options here
+}
+
+/** This plugin adds the widget service to the Fastify instance */
+export default fp<WidgetServicePluginOptions>(async (fastify, opts) => {
+  const db = fastify.mongo?.db;
+  if (!db) {
+    throw new Error('MongoDB not available');
+  }
+
+  const widgetService = new WidgetService(db);
+  fastify.decorate('widgetService', widgetService);
+});
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    widgetService: WidgetService;
+  }
+}
