@@ -11,7 +11,7 @@ Dieses Projekt implementiert ein Dashboard zur Anzeige von Wetter-Widgets für v
 ├── frontend/                  → Next.js Frontend (Dashboard)
 │   ├── public/                → Statische Assets (Bilder, Fonts etc.)
 │   └── src/
-│       ├── components/        → Wiederverwendbare React-Komponenten
+│       ├── components/        → Wiederverwendbare React-Komponenten (Presentation)
 │       ├── pages/             → Routenbasierte Seiten (Container)
 │       ├── styles/            → Globale Stylesheets / Tailwind-Styles
 │       ├── types/             → Typdefinitionen für TypeScript
@@ -25,8 +25,8 @@ Dieses Projekt implementiert ein Dashboard zur Anzeige von Wetter-Widgets für v
 │   │   ├── routes/            → Routen-Definitionen
 │   │   ├── services/          → Geschäftslogik (z. B. Wetterabrufe)
 │   │   └── types/             → DTOs und Typdefinitionen
-│   └── test/                  → Backend-spezifische Tests
-│   └── app.ts                 → Fastify Instanz & App-Konfiguration
+│   ├── test/                  → Backend-spezifische Tests (tbd)
+│   ├── app.ts                 → Fastify-Instanz & App-Konfiguration
 │   └── main.ts                → Backend-Startscript
 └── README.md                  → Projektbeschreibung und Setup
 ```
@@ -37,7 +37,7 @@ Dieses Projekt implementiert ein Dashboard zur Anzeige von Wetter-Widgets für v
 
 ### Voraussetzungen
 
-- Node.js: v22 oder höher
+- Node.js: v22 (LTS) oder höher
 - MongoDB: Lokal oder über MongoDB Atlas
 - NPM: Als Paketmanager
 - OpenWeather API-Key: Für Wetterdaten (siehe [OpenWeather API](https://openweathermap.org/api))
@@ -56,7 +56,9 @@ npm run dev
 ```
 
 Backend-Konfiguration:  
-Eine `.env`-Datei im `backend`-Verzeichnis mit folgendem Inhalt erstellen:
+_Eine `.env`-Datei für die Demo wird gesondert bereitgestellt_
+
+Für eine eigene Konfiguration eine `.env`-Datei im `backend`-Verzeichnis mit folgendem Inhalt erstellen:
 
 ```
 NODE_ENV=development
@@ -85,7 +87,9 @@ npm run dev
 ```
 
 Frontend-Konfiguration:  
-Eine `.env.local`-Datei im `frontend`-Verzeichnis mit folgendem Inhalt erstellen:
+_Eine `.env`-Datei für die Demo wird gesondert bereitgestellt_
+
+Für eine eigene Konfiguration eine `.env.local`-Datei im `frontend`-Verzeichnis mit folgendem Inhalt erstellen:
 
 ```
 NEXT_PUBLIC_API_BASE_URI=http://localhost:5000
@@ -103,7 +107,8 @@ Das Frontend ist standardmäßig unter `http://localhost:3000` erreichbar.
 - Komponentenbasierte Architektur mit Container/Presentation Pattern.
 - Container-Komponente: `src/pages/dashboard` – Verwaltet die Logik des Dashboards.
 - Präsentationskomponenten: Im `src/components`-Ordner – Zuständig für die Darstellung von Widgets.
-- Funktionen: Erstellen, Anzeigen und Löschen von Widgets für Städte.
+- Tailwind für Styling
+- Funktionen: Erstellen, Anzeigen und Löschen von WeatherWidgets für beliebige Städte.
 - Keine Authentifizierung erforderlich.
 
 ### Backend (API)
@@ -132,7 +137,7 @@ Das Frontend ist standardmäßig unter `http://localhost:3000` erreichbar.
 ## ☁️ Wetterdaten
 
 - Wetterdaten werden von [OpenWeather](https://openweathermap.org/api) abgerufen.
-- Caching erfolgt im Backend, um API-Aufrufe zu minimieren (TTL: 5 Minuten).
+- Caching erfolgt im Backend, um API-Aufrufe zu minimieren (TTL: 5 Minuten, konfigurierbar).
 
 ---
 
@@ -144,24 +149,30 @@ Das Projekt folgt einer klaren Trennung von Frontend und Backend:
 - Backend: Fastify mit MVC-Struktur, MongoDB für persistente Speicherung und In-Memory-Caching für externe API-Daten.
 - Kommunikation: Das Frontend kommuniziert über REST-API mit dem Backend (`http://localhost:5000`).
 - Datenfluss:
-  1. Benutzer sucht nach Städten.
-  2. Benuter erstellt Widgets für die gefundenen Städte.
-  3. Widgets werden in der Datenbank mit geolocation-Informationen gespeichert.
-  4. Das Backend verarbeitet Anfragen, speichert Widgets in MongoDB und ruft Wetterdaten von OpenWeather ab (mit Caching).
+  1. Benutzer sucht über das Dashboard nach Städten (via `/locations`).
+  2. Er wählt Städte aus und erstellt daraus Wetter-Widgets (`POST /widgets`).
+  3. Die Widget-Daten inkl. Geolocation werden in MongoDB gespeichert.
+  4. Bei Abruf (`GET /widgets`) lädt das Backend die gespeicherten Einträge, ergänzt sie ggf. mit aktuellen Wetterdaten von OpenWeather (mit Cachin) und sendet die angereicherten Daten an das Frontend zurück.
+  5. Benutzer kann widgets via click löschen (`DELETE /widgets/:id`).
 
 ---
 
 ## 🧾 Hinweise
 
-- Das Projekt ist noch nicht feature-complete, die grundlegende Funktionalität (Widget-Erstellung, -Anzeige, -Löschung) ist jedoch umgesetzt.
-- Fehlerbehandlung, Validierung und Logging sind bislang nur rudimentär implementiert.
-- Das Layout der Dashboard-Seite ist responsive und passt sich an verschiedene Bildschirmgrößen an.
-- Die Städtesuche wurde mit einem Typeahead-Control inklusive Eingabe-Debouncing realisiert.
-- Zukünftige Erweiterungen könnten Authentifizierung oder zusätzliche Widget-Optionen umfassen.
-- Der Code ist modular strukturiert, um Erweiterbarkeit und Wartbarkeit zu gewährleisten.
+- Das Projekt ist noch nicht feature-complete. Die grundlegende Funktionalität wie das Erstellen, Anzeigen und Löschen von Widgets ist jedoch umgesetzt.
+- Fehlerbehandlung, Validierung und Logging sind bisher nur in einfacher Form vorhanden.
+- Insbesondere im Backend ist eine zuverlässige Validierung notwendig und sollte bei einer Weiterentwicklung zwingend berücksichtigt werden.
+- Aktuell sind keine automatisierten Tests vorhanden. Unit- und Integrationstests sollten ergänzt werden.
+- Eine Internationalisierung (i18n) ist derzeit nicht umgesetzt. Die Anwendung unterstützt aktuell nur Deutsch.
+- Das Layout der Dashboard-Seite ist responsive und passt sich verschiedenen Bildschirmgrößen an.
+- Die Städtesuche wurde mit einem Typeahead-Control realisiert, inklusive Eingabe-Debouncing.
+- Zukünftige Erweiterungen könnten eine Authentifizierung, Benutzerverwaltung oder zusätzliche Optionen für Widgets umfassen.
+- Der Code ist modular aufgebaut, um eine gute Erweiterbarkeit und Wartbarkeit zu ermöglichen.
 - Es wurde darauf geachtet, möglichst wenige externe Bibliotheken zu verwenden, um die Komplexität gering zu halten.
+- Für bessere Barrierefreiheit (a11y) und eine konsistente UI wäre der Einsatz einer geeigneten UI-Bibliothek sinnvoll. Je nach Designvorgaben könnte eine headless Lösung oder ein Framework mit integrierter a11y-Unterstützung in Betracht gezogen werden.
+- Wird der mitgelieferte API-Key für die OpenWeather-Schnittstelle genutzt, ist die Anzahl der API-Abfragen auf 60 pro Stunde begrenzt.
 
 ## ⚙️ Alternativen
 
-- Da Backend und Frontend im selben Repository liegen, wäre der Einsatz eines Monorepo-Tools wie [Nx](https://nx.dev) denkbar. Dies könnte die Struktur klarer aufteilen, Abhängigkeiten besser verwalten und Code-Sharing erleichtern.
-- Statt der aktuellen MVC-Struktur könnte eine Feature-basierte Trennung sinnvoll sein, wodurch Controller, Models und Services besser wiederverwendbar würden.
+- Da Backend und Frontend im selben Repository liegen, wäre der Einsatz eines Monorepo-Tools wie [Nx](https://nx.dev) denkbar. Vorteile wären u. a. klarere Trennung von Applikationen, einfacheres Code-Sharing (z. B. DTOs), ein Abhängigkeitsgraph und inkrementelle Builds.
+- Anstelle der klassischen MVC-Struktur im Backend wäre auch eine Feature-basierte Architektur denkbar, bei der der Code nach fachlicher Zugehörigkeit (z. B. weather/, locations/) organisiert wird, was insbesondere bei wachsendem Codeumfang die Wartbarkeit, Skalierbarkeit sowie die Wiederverwendbarkeit und Portierbarkeit einzelner Module verbessert.
