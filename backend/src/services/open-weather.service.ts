@@ -1,6 +1,6 @@
 import { OpenWeatherLocation } from '../types/geolocation.types';
 import { WeatherApiResponse } from '../types/open-weather.types';
-import { mockWeatherApiResponse } from './mock-open-weather-data';
+// import { mockWeatherApiResponse } from './mock-open-weather-data';
 
 /** Fetches the coordinates for a given city from the OpenWeather API */
 export const fetchCoordinatesForCity = async (city: string): Promise<OpenWeatherLocation[]> => {
